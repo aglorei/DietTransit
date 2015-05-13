@@ -13,6 +13,8 @@ var timeline = new Timeline();
 // handler for GET /senduserpin/:userToken/:minutesToAdd?
 app.get('/senduserpin/:userToken/:minutesToAdd?', function (request, response){
 
+	console.log('hereooo');
+
 	var userToken = request.params.userToken;
 	var minutesToAdd = request.params.minutesToAdd || 0;
 

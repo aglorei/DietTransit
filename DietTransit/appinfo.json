@@ -6,12 +6,15 @@
   "versionCode": 1,
   "versionLabel": "1.0",
   "sdkVersion": "3",
-  "targetPlatforms": ["aplite", "basalt"],
+  "targetPlatforms": ["basalt"],
   "watchapp": {
     "watchface": false
   },
   "appKeys": {
-    "dummy": 0
+    "ready": 0,
+    "text": 1,
+    "minutes": 2,
+    "quit": 3
   },
   "resources": {
     "media": []

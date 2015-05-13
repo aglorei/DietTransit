@@ -21,13 +21,13 @@ static void request_pin(uint32_t minutes) {
 }
 
 static void check_launch_args() {
-// store launch_arg locally so we can change it later
+	// store launch_arg locally so we can change it later
 	uint32_t launch_arg = launch_get_args();
 
-// make launch_arg 5 so we send a pin that's in future
+	// make launch_arg 5 so we send a pin that's in future
 	if (launch_arg == 0) launch_arg = 5;
 
-// request a pin in `launch_arg` minutes
+	// request a pin in `launch_arg` minutes
 	request_pin(launch_arg);
 
 	snprintf(text, sizeof(text), "Requesting a pin to be sent in %d minutes...", (int)launch_arg);
