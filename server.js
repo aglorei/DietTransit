@@ -19,7 +19,7 @@ app.get('/senduserpin/:userToken/:minutesToAdd?', function (request, response){
 	console.log('Got a request from ' + userToken + ' to send in a pin in ' + minutesToAdd + ' min');
 
 	// generate random id
-	var id = randomstring.generate(8);
+	var id = randomstring.generate(64);
 
 	var now = new Date();
 

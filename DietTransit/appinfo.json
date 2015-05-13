@@ -1,0 +1,19 @@
+{
+  "uuid": "66fe296d-b7bd-4247-907b-2ceab9dc781b",
+  "shortName": "DietTransit",
+  "longName": "DietTransit",
+  "companyName": "AGLOREI",
+  "versionCode": 1,
+  "versionLabel": "1.0",
+  "sdkVersion": "3",
+  "targetPlatforms": ["aplite", "basalt"],
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": []
+  }
+}
