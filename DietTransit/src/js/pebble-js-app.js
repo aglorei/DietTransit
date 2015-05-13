@@ -1,5 +1,5 @@
 // var API_ROOT = 'https://diettransit.herokuapp.com';
-var API_ROOT = 'http://localhost:5000';
+var API_ROOT = 'https://diettransit.herokuapp.com';
 var myToken;
 
 // request a pin to be sent to the userToken
