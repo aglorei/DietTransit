@@ -38,14 +38,14 @@ app.get('/senduserpin/:userToken/:minutesToAdd?', function (request, response){
 	// add actions to the pin
 	[10, 20, 30].forEach(function (min){
 		pin.addAction(new Timeline.Pin.Action({
-			type: Timeline.Pin.ActionType.OPEN_WATCHAPP,
+			type: Timeline.Pin.ActionType.OPEN_WATCH_APP,
 			title: min + ' min',
 			launchCode: min
 		}));
 	});
 
 	// send the pin
-	timeline.sendUserPin(userToken, pin, function (error, body, response){
+	timeline.sendUserPin(userToken, pin, function (error, body, resp){
 		if (error){
 			return console.log(error);
 		}
