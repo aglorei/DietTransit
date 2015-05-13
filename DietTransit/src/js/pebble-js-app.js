@@ -1,4 +1,4 @@
-var API_ROOT = 'https://diettransit.herokuapp.com/';
+var API_ROOT = 'https://diettransit.herokuapp.com';
 var myToken;
 
 // request a pin to be sent to the userToken
