@@ -1,6 +1,7 @@
 var express = require('express');
 var randomstring = require('randomstring');
 var Timeline = require('pebble-api');
+var http = require('http');
 var app = express();
 
 // handler for GET '/'
@@ -8,7 +9,9 @@ app.get('/', function (request, response){
 	response.send('Hello, World');
 });
 
-var timeline = new Timeline();
+var timeline = new Timeline({
+	apiKey: process.env.PEBBLE_TIMELINE_API_KEY
+});
 
 // handler for GET /senduserpin/:userToken/:minutesToAdd?
 app.get('/senduserpin/:userToken/:minutesToAdd?', function (request, response){
