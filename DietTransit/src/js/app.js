@@ -8,95 +8,6 @@ var locationOptions = {
 	maximumAge: 10000,
 	timeout: 10000
 };
-var latitude = 47.6097;
-var longitude = -122.3335;
-
-// on successful Geolocation API call, log coordinates
-function locationSuccess(pos) {
-	latitude = pos.coords.latitude;
-	longitude = pos.coords.longitude;
-	console.log('lat= ' + latitude + ' lon= ' + longitude);
-}
-
-// on error, log error
-function locationError(err) {
-	console.log('location error (' + err.code + '): ' + err.message);
-}
-
-// Make an asynchronous request
-navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
-
-// var parseFeed = function(data, quantity) {
-// 	var items = [];
-// 	for(var i = 0; i < quantity; i++) {
-// 		// Always upper case the description string
-// 		var title = data.list[i].weather[0].main;
-// 		title = title.charAt(0).toUpperCase() + title.substring(1);
-
-// 		// Get date/time substring
-// 		var time = data.list[i].dt_txt;
-// 		time = time.substring(time.indexOf('-') + 1, time.indexOf(':') + 3);
-
-// 		// Add to menu items array
-// 		items.push({
-// 			title:title,
-// 			subtitle:time
-// 		});
-// 	}
-
-// 	// Finally return whole array
-// 	return items;
-// };
-
-// Parse data retrieved from API call
-var parseRoutes = function(routeData, startIndex) {
-	var items = [];
-	var endDistance = routeData.length - startIndex;
-	var quantity = endDistance < 10 ? endDistance : 10;
-
-	// Pagination for "previous" results
-	if (startIndex > 9) {
-		var prevPagination = paginationItem(startIndex - 9, startIndex, 'Previous');
-		items.push(prevPagination);
-	}
-
-	// Main results
-	for (var i=startIndex; i<startIndex + quantity; i++) {
-			var item = {
-				// routeData index
-				pathIndex: i,
-				// Route number
-				title: routeData[i].shortName,
-				// Route description
-				subtitle: routeData[i].description,
-			};
-			items.push(item);
-	}
-
-	// Pagination for "next" results
-	if (endDistance > 9) {
-		var nextPagination = paginationItem(startIndex + 11, Math.min(startIndex + 20, routeData.length), 'Next');
-		items.push(nextPagination);
-	}
-
-	return items;
-};
-
-// Create pagination item for Menu Window
-var paginationItem = function(startIndex, endIndex, string) {
-	return {
-		pathIndex: string,
-		title: string + ' results',
-		subtitle: startIndex + ' - ' + endIndex
-	};
-};
-
-var routeSection = function(routeData, routePage, totalPage) {
-	return {
-		title: 'Nearby Routes (' + (routePage % 10) + '/' + (totalPage+1) +')',
-		items: parseRoutes(routeData, routePage)
-	};
-};
 
 // Show splash screen while waiting for data
 var splashWindow = new UI.Window();
@@ -117,52 +28,144 @@ var text = new UI.Text({
 splashWindow.add(text);
 splashWindow.show();
 
-ajax(
-	{
-		url: 'http://api.pugetsound.onebusaway.org/api/where/stops-for-location.json?key=TEST&lat=47.612774&lon=-122.345207&radius=500',
-		type: 'json'
-	},
-	function (data) {
-		var routeData = data.data.references.routes;
-		var routePage = 0;
-		var totalPage = Math.floor(routeData.length / 10 % 10);
+// on successful Geolocation API call, log coordinates and send ajax call
+function locationSuccess(pos) {
+	var latitude = pos.coords.latitude.toFixed(6);
+	var longitude = pos.coords.longitude.toFixed(6);
+	console.log('lat= ' + latitude + ' lon= ' + longitude);
 
-		// Construct Menu to show to user
-		var resultsMenu = new UI.Menu({
-			sections: [routeSection(routeData, routePage, totalPage)]
-		});
+	ajax(
+		{
+			url: 'http://api.pugetsound.onebusaway.org/api/where/stops-for-location.json?key=TEST&lat='+ latitude +'&lon='+ longitude +'&radius=500',
+			type: 'json'
+		},
+		function (data) {
+			var routeData = data.data.references.routes;
+			var routePage = 0;
+			var totalPage = Math.floor(routeData.length / 10 % 10);
 
-		// Add SELECT actions for each resultsMenu item
-		resultsMenu.on('select', function(e) {
-			// Route specifics
-			if (typeof e.item.pathIndex === 'number') {
-				var detailCard = new UI.Card({
-					title: e.item.title,
-					subtitle: e.item.subtitle,
-					body: routeData[e.item.pathIndex].id,
-					style: 'small',
-					scrollable: true
-				});
+			// Parse data retrieved from API call
+			var parseRoutes = function(routeData, startIndex) {
+				var items = [];
+				var endDistance = routeData.length - startIndex;
+				var quantity = endDistance < 10 ? endDistance : 10;
 
-				detailCard.show();
-			// Paginate Prev
-			} else if (e.item.pathIndex === 'Previous') {
-				routePage -= 10;
-				e.menu.section(0, routeSection(routeData, routePage, totalPage));
-			// Paginate Next
-			} else if (e.item.pathIndex === 'Next') {
-				routePage += 10;
-				e.menu.section(0, routeSection(routeData, routePage, totalPage));
-			}
-		});
+				// Pagination for "previous" results
+				if (startIndex > 9) {
+					var prevPagination = paginationItem(startIndex - 9, startIndex, 'Previous');
+					items.push(prevPagination);
+				}
 
-		resultsMenu.show();
-		splashWindow.hide();
-	},
-	function (error) {
-		console.log("Download failed: " + error);
-	}
-);
+				// Pagination for "next" results
+				if (endDistance > 9) {
+					var nextPagination = paginationItem(startIndex + 11, Math.min(startIndex + 20, routeData.length), 'Next');
+					items.push(nextPagination);
+				}
+
+				// Main results
+				for (var i=startIndex; i<startIndex + quantity; i++) {
+						var item = {
+							// routeData index
+							pathIndex: i,
+							// Route number
+							title: routeData[i].shortName,
+							// Route description
+							subtitle: routeData[i].description,
+						};
+						items.push(item);
+				}
+
+				return items;
+			};
+
+			// Create pagination item for Menu Window
+			var paginationItem = function(startIndex, endIndex, string) {
+				return {
+					pathIndex: string,
+					title: string + ' results',
+					subtitle: startIndex + ' - ' + endIndex
+				};
+			};
+
+			var routeSection = function(routeData, routePage, totalPage) {
+				return {
+					title: 'Nearby Routes (' + (routePage / 10) + '/' + (totalPage+1) +')',
+					items: parseRoutes(routeData, routePage)
+				};
+			};
+
+			// Construct Menu to show to user
+			var resultsMenu = new UI.Menu({
+				sections: [routeSection(routeData, routePage, totalPage)]
+			});
+
+			// Add SELECT actions for each resultsMenu item
+			resultsMenu.on('select', function(e) {
+				// Route specifics
+				if (typeof e.item.pathIndex === 'number') {
+					var detailCard = new UI.Card({
+						title: e.item.title,
+						subtitle: e.item.subtitle,
+						body: routeData[e.item.pathIndex].id,
+						style: 'small',
+						scrollable: true
+					});
+
+					detailCard.show();
+				// Paginate Prev
+				} else if (e.item.pathIndex === 'Previous') {
+					routePage -= 10;
+					e.menu.section(0, routeSection(routeData, routePage, totalPage));
+				// Paginate Next
+				} else if (e.item.pathIndex === 'Next') {
+					routePage += 10;
+					e.menu.section(0, routeSection(routeData, routePage, totalPage));
+				}
+			});
+
+			// Register for 'tap' events
+			resultsMenu.on('accelTap', function(e) {
+				// Make another request to openweathermap.org
+				ajax(
+					{
+						url:'http://api.openweathermap.org/data/2.5/forecast?q=London',
+						type:'json'
+					},
+					function(data) {
+						resultsMenu.hide();
+						resultsMenu.hide();
+						splashWindow.show();
+
+						// Make another asynchronous request
+						navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
+
+						// Notify the user
+						Vibe.vibrate('short');
+
+						return true;
+					},
+					function(error) {
+						console.log('Download failed: ' + error);
+					}
+				);
+			});
+
+			resultsMenu.show();
+			splashWindow.hide();
+		},
+		function (error) {
+			console.log("Download failed: " + error);
+		}
+	);
+}
+
+// on error, log error
+function locationError(err) {
+	console.log('location error (' + err.code + '): ' + err.message);
+}
+
+// Make an asynchronous request
+navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
 
 // // Make request to openweathermap.org
 // ajax(
