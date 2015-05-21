@@ -28,6 +28,9 @@ var text = new UI.Text({
 splashWindow.add(text);
 splashWindow.show();
 
+// Make an asynchronous request
+navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
+
 // on successful Geolocation API call, log coordinates and send ajax call
 function locationSuccess(pos) {
 	var latitude = pos.coords.latitude.toFixed(6);
@@ -38,6 +41,8 @@ function locationSuccess(pos) {
 		{
 			url: 'http://api.pugetsound.onebusaway.org/api/where/stops-for-location.json?key=TEST&lat='+ latitude +'&lon='+ longitude +'&radius=500',
 			type: 'json'
+			// url: 'http://api.pugetsound.onebusaway.org/api/where/routes-for-location.xml?key=TEST&lat=47.653435&lon=-122.305641',
+			// type: 'json'
 		},
 		function (data) {
 			var routeData = data.data.references.routes;
@@ -151,9 +156,6 @@ function locationSuccess(pos) {
 function locationError(err) {
 	console.log('location error (' + err.code + '): ' + err.message);
 }
-
-// Make an asynchronous request
-navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
 
 // Prepare the accelerometer
 Accel.init();
