@@ -89,7 +89,7 @@ function locationSuccess(pos) {
 
 			var routeSection = function(routeData, routePage, totalPage) {
 				return {
-					title: 'Nearby Routes (' + (routePage / 10) + '/' + (totalPage+1) +')',
+					title: 'Nearby Routes (' + (routePage / 10 + 1) + '/' + (totalPage+1) +')',
 					items: parseRoutes(routeData, routePage)
 				};
 			};
@@ -125,29 +125,17 @@ function locationSuccess(pos) {
 
 			// Register for 'tap' events
 			resultsMenu.on('accelTap', function(e) {
-				// Make another request to openweathermap.org
-				ajax(
-					{
-						url:'http://api.openweathermap.org/data/2.5/forecast?q=London',
-						type:'json'
-					},
-					function(data) {
-						resultsMenu.hide();
-						resultsMenu.hide();
-						splashWindow.show();
+				resultsMenu.hide();
+				resultsMenu.hide();
+				splashWindow.show();
 
-						// Make another asynchronous request
-						navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
+				// Make another asynchronous request
+				navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
 
-						// Notify the user
-						Vibe.vibrate('short');
+				// Notify the user
+				Vibe.vibrate('short');
 
-						return true;
-					},
-					function(error) {
-						console.log('Download failed: ' + error);
-					}
-				);
+				return true;
 			});
 
 			resultsMenu.show();
